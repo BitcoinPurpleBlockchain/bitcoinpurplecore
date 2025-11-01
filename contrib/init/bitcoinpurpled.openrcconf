@@ -1,0 +1,33 @@
+# /etc/conf.d/bitcoinpurpled: config file for /etc/init.d/bitcoinpurpled
+
+# Config file location
+#BITCOINPURPLED_CONFIGFILE="/etc/bitcoinpurple/bitcoinpurple.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOINPURPLED_USER)
+#BITCOINPURPLED_PIDDIR="/var/run/bitcoinpurpled"
+
+# What filename to give the pidfile
+#BITCOINPURPLED_PIDFILE="${BITCOINPURPLED_PIDDIR}/bitcoinpurpled.pid"
+
+# Where to write bitcoinpurpled data (be mindful that the blockchain is large)
+#BITCOINPURPLED_DATADIR="/var/lib/bitcoinpurpled"
+
+# User and group to own bitcoinpurpled process
+#BITCOINPURPLED_USER="bitcoinpurple"
+#BITCOINPURPLED_GROUP="bitcoinpurple"
+
+# Path to bitcoinpurpled executable
+#BITCOINPURPLED_BIN="/usr/bin/bitcoinpurpled"
+
+# Nice value to run bitcoinpurpled under
+#BITCOINPURPLED_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+#BITCOINPURPLED_OPTS=""
+
+# The timeout in seconds OpenRC will wait for bitcoinpurpled to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+BITCOINPURPLED_SIGTERM_TIMEOUT=600

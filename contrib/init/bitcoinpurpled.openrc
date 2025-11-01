@@ -1,0 +1,93 @@
+#!/sbin/openrc-run
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/bitcoinpurple/.bitcoinpurple" ]; then
+	BITCOINPURPLED_DEFAULT_DATADIR="/var/lib/bitcoinpurple/.bitcoinpurple"
+else
+	BITCOINPURPLED_DEFAULT_DATADIR="/var/lib/bitcoinpurpled"
+fi
+
+BITCOINPURPLED_CONFIGFILE=${BITCOINPURPLED_CONFIGFILE:-/etc/bitcoinpurple/bitcoinpurple.conf}
+BITCOINPURPLED_PIDDIR=${BITCOINPURPLED_PIDDIR:-/var/run/bitcoinpurpled}
+BITCOINPURPLED_PIDFILE=${BITCOINPURPLED_PIDFILE:-${BITCOINPURPLED_PIDDIR}/bitcoinpurpled.pid}
+BITCOINPURPLED_DATADIR=${BITCOINPURPLED_DATADIR:-${BITCOINPURPLED_DEFAULT_DATADIR}}
+BITCOINPURPLED_USER=${BITCOINPURPLED_USER:-${BITCOINPURPLE_USER:-bitcoinpurple}}
+BITCOINPURPLED_GROUP=${BITCOINPURPLED_GROUP:-bitcoinpurple}
+BITCOINPURPLED_BIN=${BITCOINPURPLED_BIN:-/usr/bin/bitcoinpurpled}
+BITCOINPURPLED_NICE=${BITCOINPURPLED_NICE:-${NICELEVEL:-0}}
+BITCOINPURPLED_OPTS="${BITCOINPURPLED_OPTS:-${BITCOINPURPLE_OPTS}}"
+
+name="BitcoinPurple Core Daemon"
+description="BitcoinPurple cryptocurrency P2P network daemon"
+
+command="/usr/bin/bitcoinpurpled"
+command_args="-pid=\"${BITCOINPURPLED_PIDFILE}\" \
+		-conf=\"${BITCOINPURPLED_CONFIGFILE}\" \
+		-datadir=\"${BITCOINPURPLED_DATADIR}\" \
+		-daemon \
+		${BITCOINPURPLED_OPTS}"
+
+required_files="${BITCOINPURPLED_CONFIGFILE}"
+start_stop_daemon_args="-u ${BITCOINPURPLED_USER} \
+			-N ${BITCOINPURPLED_NICE} -w 2000"
+pidfile="${BITCOINPURPLED_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${BITCOINPURPLED_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${BITCOINPURPLED_USER}:${BITCOINPURPLED_GROUP}" \
+	"${BITCOINPURPLED_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${BITCOINPURPLED_USER}:${BITCOINPURPLED_GROUP}" \
+	"${BITCOINPURPLED_PIDDIR}"
+
+	checkpath -f \
+	-o "${BITCOINPURPLED_USER}:${BITCOINPURPLED_GROUP}" \
+	-m 0660 \
+	"${BITCOINPURPLED_CONFIGFILE}"
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if grep -qs '^rpcuser=' "${BITCOINPURPLED_CONFIGFILE}" && \
+		! grep -qs '^rpcpassword=' "${BITCOINPURPLED_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run bitcoinpurpled."
+		eerror "The setting must appear in ${BITCOINPURPLED_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following "
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"BitcoinPurple Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

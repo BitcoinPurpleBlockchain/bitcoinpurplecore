@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+#  bitcoinpurpled The bitcoinpurple core server.
+#
+#
+# chkconfig: 345 80 20
+# description: bitcoinpurpled
+# processname: bitcoinpurpled
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/bitcoinpurpled, see below
+if [ -f /etc/sysconfig/bitcoinpurpled ]; then
+        . /etc/sysconfig/bitcoinpurpled
+fi
+
+RETVAL=0
+
+prog=bitcoinpurpled
+# you can override the lockfile via BITCOINPURPLED_LOCKFILE in /etc/sysconfig/bitcoinpurpled
+lockfile=${BITCOINPURPLED_LOCKFILE-/var/lock/subsys/bitcoinpurpled}
+
+# bitcoinpurpled defaults to /usr/bin/bitcoinpurpled, override with BITCOINPURPLED_BIN
+bitcoinpurpled=${BITCOINPURPLED_BIN-/usr/bin/bitcoinpurpled}
+
+# bitcoinpurpled opts default to -disablewallet, override with BITCOINPURPLED_OPTS
+bitcoinpurpled_opts=${BITCOINPURPLED_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $bitcoinpurpled $bitcoinpurpled_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -t600
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

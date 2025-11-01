@@ -1,23 +1,78 @@
-A global and free-for-all currency, fully decentralized, created to be a means of free transactions and without central command. Bitcoin Purple is a SHA-256D coin, created and designed similarly to Bitcoin (BTC), with a similar purpose but faster transactions than Bitcoin Purple.
+BitcoinPurple Core integration/staging tree
+=====================================
 
-Use your Bitcoin Purple as a store of value, as a means of exchange, payments and so you can be free to buy, store or collect.
-In a decentralized way, you can be part of Purple's, create integrations, applications, websites, make donations, mine, create mining pools, buy and sell, save. Be free worldwide using Bittcoin Purple.
-SHA-256D
- 
-RPC: 13495
+https://bitcoincore.org
 
-P2P: 13496
+For an immediately usable, binary version of the BitcoinPurple Core software, see
+https://bitcoincore.org/en/download/.
 
-It is only possible to mine one BTCP per Block, it is possible to mine only 1 000 000.
+What is BitcoinPurple Core?
+---------------------
 
-CONTRIBUTE TO MARKET CREATION
+BitcoinPurple Core connects to the BitcoinPurple peer-to-peer network to download and fully
+validate blocks and transactions. It also includes a wallet and graphical user
+interface, which can be optionally built.
 
-USDT or ETH  | 0xd773b361699563e558322e1338a7ec07d9fe0487
+Further information about BitcoinPurple Core is available in the [doc folder](/doc).
 
- 
-BTC 
-Min: 0.0001 BTC | 12dsv45NHfvKTvvNS95VNh2pwZ7hLG4gbG
-​
-Min: 0.05 LTC | LSjku1Yb56GQ94K6FE8jEJcV8dnYMaqDNk
-​
-Min: 0.005 ETH ERC20 | 0xa8a2c04c99b1092a13683ff5082782f57ec033d8
+License
+-------
+
+BitcoinPurple Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
+information or see https://opensource.org/licenses/MIT.
+
+Development Process
+-------------------
+
+The `master` branch is regularly built (see `doc/build-*.md` for instructions) and tested, but it is not guaranteed to be
+completely stable. [Tags](https://github.com/bitcoinpurple/bitcoinpurple/tags) are created
+regularly from release branches to indicate new official, stable release versions of BitcoinPurple Core.
+
+The https://github.com/bitcoinpurple-core/gui repository is used exclusively for the
+development of the GUI. Its master branch is identical in all monotree
+repositories. Release branches and tags do not exist, so please do not fork
+that repository unless it is for development reasons.
+
+The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
+and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
+
+Testing
+-------
+
+Testing and code review is the bottleneck for development; we get more pull
+requests than we can review and test on short notice. Please be patient and help out by testing
+other people's pull requests, and remember this is a security-critical project where any mistake might cost people
+lots of money.
+
+### Automated Testing
+
+Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
+submit new unit tests for old code. Unit tests can be compiled and run
+(assuming they weren't disabled in configure) with: `make check`. Further details on running
+and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
+
+There are also [regression and integration tests](/test), written
+in Python.
+These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
+
+The CI (Continuous Integration) systems make sure that every pull request is built for Windows, Linux, and macOS,
+and that unit/sanity tests are run automatically.
+
+### Manual Quality Assurance (QA) Testing
+
+Changes should be tested by somebody other than the developer who wrote the
+code. This is especially important for large or high-risk changes. It is useful
+to add a test plan to the pull request description if testing the changes is
+not straightforward.
+
+Translations
+------------
+
+Changes to translations as well as new translations can be submitted to
+[BitcoinPurple Core's Transifex page](https://www.transifex.com/bitcoinpurple/bitcoinpurple/).
+
+Translations are periodically pulled from Transifex and merged into the git repository. See the
+[translation process](doc/translation_process.md) for details on how this works.
+
+**Important**: We do not accept translation changes as GitHub pull requests because the next
+pull from Transifex would automatically overwrite them again.
