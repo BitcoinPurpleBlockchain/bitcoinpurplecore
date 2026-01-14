@@ -26,6 +26,7 @@ RUN apt-get update && \
         # Additional tools for depends system
         cmake \
         xz-utils \
+        bison \
         # Build optimization
         ccache && \
     rm -rf /var/lib/apt/lists/*
