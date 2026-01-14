@@ -56,7 +56,10 @@ WORKDIR /tmp
 RUN wget -q http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz && \
     echo "12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef  db-4.8.30.NC.tar.gz" | sha256sum -c - && \
     tar -xzf db-4.8.30.NC.tar.gz && \
-    cd db-4.8.30.NC/build_unix && \
+    cd db-4.8.30.NC && \
+    # Apply patch to fix atomic function conflicts with modern compilers
+    sed -i 's/__atomic_compare_exchange/__atomic_compare_exchange_db/g' dbinc/atomic.h && \
+    cd build_unix && \
     ../dist/configure \
         --prefix=/opt/db4 \
         --enable-cxx \
