@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build outputs
+build-output/
+*.o
+*.lo
+*.a
+*.la
+*.so
+*.dll
+*.exe
+src/bitcoinpurpled
+src/bitcoinpurple-cli
+src/bitcoinpurple-tx
+src/bitcoinpurple-wallet
+src/bitcoinpurple-qt
+src/qt/bitcoinpurple-qt
+src/test/test_bitcoinpurple
+src/bench/bench_bitcoinpurple
+
+# Documentation
+doc/*.html
+doc/*.pdf
+
+# CI/CD
+.github/
+.travis.yml
+.cirrus.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies build artifacts
+depends/built/
+depends/sources/
+depends/work/
+depends/x86_64*
+depends/i686*
+depends/arm*
+depends/aarch64*
+
+# Test artifacts
+test/cache/
+test/lint/
+qa/
+
+# Misc
+*.md
+!README.md
+*.txt
+*.log
+*.tar.gz
+*.zip
+share/pixmaps/
+share/man/
+contrib/debian/
+contrib/macdeploy/

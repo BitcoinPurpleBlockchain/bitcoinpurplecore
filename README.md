@@ -61,6 +61,44 @@ The built binaries will be located in:
 - `src/bitcoinpurple-tx` - Transaction utility
 - `src/bitcoinpurple-wallet` - Wallet utility
 
+## Reproducible Multi-Platform Builds with Docker
+
+For production releases and reproducible builds across multiple platforms, use the Docker-based build system. This produces deterministic binaries that can be independently verified.
+
+### Supported Platforms
+
+- **Linux x86_64** - Native build with Qt5 GUI
+- **Windows x64** - Cross-compilation
+- **Linux ARM64/AARCH64** - Cross-compilation
+- **Linux ARMv7** (32-bit ARM) - Cross-compilation
+
+### Quick Start
+
+```bash
+# Build all platforms
+cd docker-build
+./build-all.sh
+
+# Build specific platform
+cd docker-build/linux-x86_64
+./build.sh
+
+# Build specific git commit or tag (reproducible)
+./build.sh BUILD_COMMIT=v1.0.0
+```
+
+Binaries will be in `build-output/` directory, ready for distribution.
+
+### Features
+
+- **Reproducible builds** - Same source produces identical binaries
+- **BUILD_COMMIT** parameter for building specific releases
+- **Docker volumes** for ccache and dependencies (faster rebuilds)
+- **Read-only source mounts** for safety
+- **Complete documentation** and reproducibility guidelines
+
+For complete documentation, build instructions, and reproducibility verification, see [docker-build/README.md](docker-build/README.md).
+
 ## Running a Node
 
 After building, start the daemon from the repository root:
