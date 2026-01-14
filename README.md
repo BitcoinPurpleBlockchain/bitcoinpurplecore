@@ -61,6 +61,29 @@ The built binaries will be located in:
 - `src/bitcoinpurple-tx` - Transaction utility
 - `src/bitcoinpurple-wallet` - Wallet utility
 
+## Running a Node
+
+After building, start the daemon from the repository root:
+
+```bash
+# Run in the foreground (logs to stdout)
+./src/bitcoinpurpled
+
+# Or run in the background (Linux/Unix)
+./src/bitcoinpurpled -daemon
+```
+
+Use `bitcoinpurple-cli` to talk to a running node:
+
+```bash
+./src/bitcoinpurple-cli -getinfo
+```
+
+To configure the node, create `bitcoinpurple.conf` in the data directory.
+See [doc/bitcoinpurple-conf.md](doc/bitcoinpurple-conf.md) for locations,
+defaults, and a full example configuration. For platform-specific build
+instructions, see [doc/build-*.md](doc).
+
 ## License
 
 BitcoinPurple Core is released under the terms of the MIT license. See [COPYING](COPYING) for more information or see <https://opensource.org/licenses/MIT>.
