@@ -23,52 +23,12 @@ RUN apt-get update && \
         ca-certificates \
         wget \
         curl \
-        # Core dependencies
-        libevent-dev \
-        libboost-system-dev \
-        libboost-filesystem-dev \
-        libboost-test-dev \
-        libboost-thread-dev \
-        libsqlite3-dev \
-        libdb++-dev \
-        # Qt5 for GUI
-        libqt5gui5 \
-        libqt5core5a \
-        libqt5dbus5 \
-        qttools5-dev \
-        qttools5-dev-tools \
-        qtbase5-dev \
-        libqt5svg5-dev \
-        # Optional dependencies
-        libqrencode-dev \
-        libzmq3-dev \
-        libminiupnpc-dev \
-        libnatpmp-dev \
+        # Additional tools for depends system
+        cmake \
+        xz-utils \
         # Build optimization
         ccache && \
     rm -rf /var/lib/apt/lists/*
-
-###############################################################################
-# Build BerkeleyDB 4.8.30
-###############################################################################
-WORKDIR /tmp
-
-RUN wget -q http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz && \
-    echo "12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef  db-4.8.30.NC.tar.gz" | sha256sum -c - && \
-    tar -xzf db-4.8.30.NC.tar.gz && \
-    cd db-4.8.30.NC && \
-    # Apply patch to fix atomic function conflicts with modern compilers
-    sed -i 's/__atomic_compare_exchange/__atomic_compare_exchange_db/g' dbinc/atomic.h && \
-    cd build_unix && \
-    ../dist/configure \
-        --prefix=/opt/db4 \
-        --enable-cxx \
-        --disable-shared \
-        --with-pic && \
-    make -j$(nproc) && \
-    make install && \
-    cd /tmp && \
-    rm -rf db-4.8.30.NC*
 
 ###############################################################################
 # Configure ccache

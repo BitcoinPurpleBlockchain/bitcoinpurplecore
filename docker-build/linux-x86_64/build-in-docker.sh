@@ -25,6 +25,12 @@ log_info "Copying source code to build directory..."
 cp -r /workspace /build/source
 cd /build/source
 
+# Build dependencies using depends system
+log_step "Building dependencies for x86_64..."
+cd depends
+make HOST=x86_64-pc-linux-gnu -j$(nproc)
+cd ..
+
 # Clean previous builds
 log_info "Cleaning previous builds..."
 make clean || true
@@ -34,25 +40,12 @@ make distclean || true
 log_step "Running autogen.sh..."
 ./autogen.sh
 
-# Configure
+# Configure using depends
 log_step "Configuring build..."
-./configure \
+CONFIG_SITE=$PWD/depends/x86_64-pc-linux-gnu/share/config.site ./configure \
     --prefix=/output/bitcoinpurple-linux-x86_64 \
-    --enable-gui=qt5 \
-    --with-gui=qt5 \
-    --enable-zmq \
-    --with-miniupnpc \
-    --with-natpmp \
-    --with-qrencode \
-    --enable-hardening \
     --disable-tests \
-    --disable-bench \
-    --disable-ccache \
-    BDB_LIBS="-L/opt/db4/lib -ldb_cxx-4.8" \
-    BDB_CFLAGS="-I/opt/db4/include" \
-    CXXFLAGS="-O2 -pipe" \
-    CC="gcc" \
-    CXX="g++"
+    --disable-bench
 
 # Build
 log_step "Building (using $(nproc) cores)..."
