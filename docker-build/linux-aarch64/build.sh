@@ -69,9 +69,14 @@ log_step "Building BitcoinPurple Core for Linux ARM64/AARCH64"
 log_info "Project root: $PROJECT_ROOT"
 log_info "Output directory: $OUTPUT_DIR"
 
-# Build Docker image
+# Build Docker image with explicit platform for cross-compilation
 log_step "Building Docker image..."
-docker build $NO_CACHE -t bitcoinpurple-builder:linux-aarch64 -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR"
+docker buildx build $NO_CACHE \
+    --platform linux/amd64 \
+    --load \
+    -t bitcoinpurple-builder:linux-aarch64 \
+    -f "$SCRIPT_DIR/Dockerfile" \
+    "$SCRIPT_DIR"
 
 # Create ccache and depends volumes if needed
 if ! docker volume inspect bitcoinpurple_ccache_arm64 >/dev/null 2>&1; then
@@ -99,9 +104,10 @@ fi
 ACTUAL_COMMIT=$(cd "$PROJECT_ROOT" && git rev-parse HEAD)
 log_info "Building commit: $ACTUAL_COMMIT"
 
-# Run build in container
+# Run build in container with explicit platform
 log_step "Running build in container..."
 docker run --rm \
+    --platform linux/amd64 \
     -v "$PROJECT_ROOT:/workspace:ro" \
     -v "$OUTPUT_DIR:/output" \
     -v bitcoinpurple_ccache_arm64:/ccache \
