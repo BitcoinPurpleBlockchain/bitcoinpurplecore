@@ -1,7 +1,8 @@
 # Dockerfile for BitcoinPurple Core - Linux ARMv7 (32-bit ARM) Cross-Compilation
 # Produces ARMv7 Linux binaries from x86_64
 
-FROM ubuntu:22.04
+# Use amd64 base image explicitly for cross-compilation from x86_64 host
+FROM --platform=linux/amd64 ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C.UTF-8
@@ -9,8 +10,7 @@ ENV LC_ALL=C.UTF-8
 ###############################################################################
 # Install Build Dependencies
 ###############################################################################
-RUN dpkg --add-architecture armhf && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         # Build essentials
         build-essential \

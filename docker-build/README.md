@@ -11,9 +11,14 @@ Cross-platform Docker-based build system for compiling BitcoinPurple Core for mu
 
 ## Host Requirements
 
+### Host Architecture
+- **x86_64 (amd64)** - Required for all builds
+- ARM64/AARCH64 and ARMv7 builds use cross-compilation from x86_64 host
+- Running on ARM64 host is not currently supported
+
 ### Operating System
 - **Linux** (recommended): Ubuntu 20.04+, Debian 11+, Fedora 35+, Arch Linux
-- **macOS**: 11+ with Docker Desktop
+- **macOS**: 11+ with Docker Desktop (Intel or Apple Silicon with Rosetta)
 - **Windows**: 10/11 with WSL2 and Docker Desktop
 
 ### Required Software
@@ -423,15 +428,17 @@ diff hash1.txt hash2.txt && echo "✓ Reproducible!" || echo "✗ Not reproducib
 - **Output Size**: ~40MB (stripped executables)
 
 ### Linux ARM64
-- **Base**: Ubuntu 22.04 + ARM64 toolchain
-- **Method**: Cross-compilation using depends system
+- **Base**: Ubuntu 22.04 amd64 + ARM64 cross-compilation toolchain (aarch64-linux-gnu)
+- **Method**: Cross-compilation from x86_64 host using depends system
+- **Host Requirement**: x86_64 architecture (uses docker buildx with --platform linux/amd64)
 - **Features**: All cross-platform compatible features
 - **Build Time**: ~45-60 minutes (first build with depends)
 - **Output Size**: ~50MB (stripped binaries)
 
 ### Linux ARMv7
-- **Base**: Ubuntu 22.04 + ARMv7 toolchain (arm-linux-gnueabihf)
-- **Method**: Cross-compilation using depends system
+- **Base**: Ubuntu 22.04 amd64 + ARMv7 cross-compilation toolchain (arm-linux-gnueabihf)
+- **Method**: Cross-compilation from x86_64 host using depends system
+- **Host Requirement**: x86_64 architecture (uses docker buildx with --platform linux/amd64)
 - **Target**: ARMv7 32-bit hard-float (Raspberry Pi 2/3, Odroid, BeagleBone Black)
 - **Features**: All cross-platform compatible features
 - **Build Time**: ~45-60 minutes (first build with depends)
@@ -491,9 +498,18 @@ Verify internet connection and retry with `--no-cache`.
 
 Ensure MinGW alternatives are set correctly (script does this automatically).
 
-### ARM64 build fails
+### ARM64 or ARMv7 build fails on x86_64 host
 
-Verify kernel supports binfmt_misc for ARM64 emulation.
+The build system requires Docker Buildx for cross-compilation:
+
+```bash
+# Verify buildx is available
+docker buildx version
+
+# If not available, update Docker to version 19.03+ or install buildx plugin
+```
+
+**Note**: These builds do NOT require QEMU emulation as they use native x86_64 cross-compilation toolchains (aarch64-linux-gnu for ARM64, arm-linux-gnueabihf for ARMv7).
 
 ### Permission denied errors
 
