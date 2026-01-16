@@ -22,7 +22,7 @@ log_step "Building BitcoinPurple Core for Linux ARMv7 (32-bit ARM)"
 
 # Copy source to writable directory (workspace is read-only)
 log_info "Copying source code to build directory..."
-cp -r /workspace /build/source
+cp -a /workspace /build/source
 cd /build/source
 
 # Restore cached depends if available

@@ -23,6 +23,8 @@ RUN apt-get update && \
         ca-certificates \
         wget \
         curl \
+        bison \
+        flex \
         # MinGW cross-compilation toolchain
         g++-mingw-w64-x86-64 \
         mingw-w64-x86-64-dev \

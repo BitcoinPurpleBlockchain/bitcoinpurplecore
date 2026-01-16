@@ -24,6 +24,8 @@ RUN dpkg --add-architecture armhf && \
         ca-certificates \
         wget \
         curl \
+        bison \
+        flex \
         # ARMv7 cross-compilation toolchain
         g++-arm-linux-gnueabihf \
         gcc-arm-linux-gnueabihf \

@@ -24,6 +24,8 @@ RUN dpkg --add-architecture arm64 && \
         ca-certificates \
         wget \
         curl \
+        bison \
+        flex \
         # ARM64 cross-compilation toolchain
         g++-aarch64-linux-gnu \
         gcc-aarch64-linux-gnu \

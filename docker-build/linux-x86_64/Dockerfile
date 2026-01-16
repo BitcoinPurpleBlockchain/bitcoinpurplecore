@@ -27,6 +27,7 @@ RUN apt-get update && \
         cmake \
         xz-utils \
         bison \
+        flex \
         # Build optimization
         ccache && \
     rm -rf /var/lib/apt/lists/*
