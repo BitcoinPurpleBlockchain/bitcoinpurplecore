@@ -25,10 +25,21 @@ log_info "Copying source code to build directory..."
 cp -r /workspace /build/source
 cd /build/source
 
+# Restore cached depends if available
+if [ -d "/depends-cache/aarch64-linux-gnu" ]; then
+    log_info "Restoring cached dependencies..."
+    cp -r /depends-cache/* depends/ 2>/dev/null || true
+fi
+
 # Build dependencies using depends system
 log_step "Building dependencies for ARM64..."
 cd depends
 make HOST=aarch64-linux-gnu -j$(nproc)
+
+# Save built depends to cache
+log_info "Caching dependencies..."
+cp -r aarch64-linux-gnu /depends-cache/ 2>/dev/null || true
+
 cd ..
 
 # Clean previous builds

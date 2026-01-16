@@ -25,10 +25,21 @@ log_info "Copying source code to build directory..."
 cp -r /workspace /build/source
 cd /build/source
 
+# Restore cached depends if available
+if [ -d "/depends-cache/arm-linux-gnueabihf" ]; then
+    log_info "Restoring cached dependencies..."
+    cp -r /depends-cache/* depends/ 2>/dev/null || true
+fi
+
 # Build dependencies using depends system
 log_step "Building dependencies for ARMv7..."
 cd depends
 make HOST=arm-linux-gnueabihf -j$(nproc)
+
+# Save built depends to cache
+log_info "Caching dependencies..."
+cp -r arm-linux-gnueabihf /depends-cache/ 2>/dev/null || true
+
 cd ..
 
 # Clean previous builds

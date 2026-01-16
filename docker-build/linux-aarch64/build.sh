@@ -105,7 +105,7 @@ docker run --rm \
     -v "$PROJECT_ROOT:/workspace:ro" \
     -v "$OUTPUT_DIR:/output" \
     -v bitcoinpurple_ccache_arm64:/ccache \
-    -v bitcoinpurple_depends_arm64:/workspace/depends \
+    -v bitcoinpurple_depends_arm64:/depends-cache \
     -e GIT_COMMIT="$ACTUAL_COMMIT" \
     bitcoinpurple-builder:linux-aarch64
 
