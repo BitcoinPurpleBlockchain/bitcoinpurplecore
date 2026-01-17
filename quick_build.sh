@@ -38,6 +38,26 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Detect host architecture for depends system
+ARCH=$(uname -m)
+case "$ARCH" in
+    x86_64)
+        HOST_PLATFORM="x86_64-pc-linux-gnu"
+        ;;
+    aarch64|arm64)
+        HOST_PLATFORM="aarch64-linux-gnu"
+        ;;
+    armv7*|armhf)
+        HOST_PLATFORM="arm-linux-gnueabihf"
+        ;;
+    *)
+        log_error "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+esac
+
+log_info "Detected architecture: $ARCH ($HOST_PLATFORM)"
+
 ###############################################################################
 # STEP 1: Install Dependencies
 ###############################################################################
@@ -104,39 +124,43 @@ install_dependencies() {
 # STEP 2: Install BerkeleyDB 4.8
 ###############################################################################
 install_berkeleydb() {
-    log_info "Installing BerkeleyDB 4.8..."
+    log_info "Installing BerkeleyDB 4.8 via depends system..."
 
-    if [ -d "$SCRIPT_DIR/db4" ]; then
-        log_warn "BerkeleyDB directory already exists. Skipping installation."
-        log_warn "Remove db4/ folder to reinstall."
+    BDB_PREFIX="$SCRIPT_DIR/depends/$HOST_PLATFORM"
+
+    if [ -f "$BDB_PREFIX/lib/libdb_cxx-4.8.a" ]; then
+        log_warn "BerkeleyDB already built in depends/$HOST_PLATFORM"
+        log_warn "Remove depends/$HOST_PLATFORM to rebuild"
         return 0
     fi
 
-    # Check if install_db4.sh exists
-    if [ -f "./contrib/install_db4.sh" ]; then
-        ./contrib/install_db4.sh "$SCRIPT_DIR"
+    log_info "Building BerkeleyDB for $HOST_PLATFORM using depends system..."
+    log_info "This includes necessary patches for modern GCC..."
+
+    # Clean PATH from Windows paths (WSL2 compatibility)
+    # Remove /mnt/c paths that contain spaces and break the build
+    CLEAN_PATH=$(echo "$PATH" | tr ':' '\n' | grep -v "^/mnt/[a-z]" | tr '\n' ':' | sed 's/:$//')
+
+    log_info "Cleaning PATH for depends build (WSL2 compatibility)..."
+
+    # Build only BerkeleyDB using depends (with patches)
+    PATH="$CLEAN_PATH" make -C "$SCRIPT_DIR/depends" \
+        NO_BOOST=1 \
+        NO_LIBEVENT=1 \
+        NO_QT=1 \
+        NO_SQLITE=1 \
+        NO_NATPMP=1 \
+        NO_UPNP=1 \
+        NO_ZMQ=1 \
+        NO_USDT=1 \
+        -j"$(nproc)"
+
+    if [ -f "$BDB_PREFIX/lib/libdb_cxx-4.8.a" ]; then
+        log_info "BerkeleyDB 4.8 installed successfully at $BDB_PREFIX"
     else
-        log_warn "install_db4.sh script not found in contrib/"
-        log_warn "Building BerkeleyDB 4.8 from scratch..."
-
-        # Download and build BerkeleyDB 4.8
-        mkdir -p "$SCRIPT_DIR/db4"
-        cd "$SCRIPT_DIR"
-
-        wget -N 'http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
-        echo '12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef  db-4.8.30.NC.tar.gz' | sha256sum -c
-        tar -xzvf db-4.8.30.NC.tar.gz
-
-        cd db-4.8.30.NC/build_unix/
-        ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$SCRIPT_DIR/db4"
-        make -j"$(nproc)"
-        make install
-
-        cd "$SCRIPT_DIR"
-        rm -rf db-4.8.30.NC db-4.8.30.NC.tar.gz
+        log_error "BerkeleyDB build failed"
+        exit 1
     fi
-
-    log_info "BerkeleyDB 4.8 installed successfully!"
 }
 
 ###############################################################################
@@ -185,15 +209,15 @@ build_bitcoinpurple() {
         log_info "Configure script already exists, skipping autogen.sh"
     fi
 
-    # Set BerkeleyDB prefix if it exists
-    export BDB_PREFIX="$SCRIPT_DIR/db4"
+    # Set BerkeleyDB prefix from depends
+    export BDB_PREFIX="$SCRIPT_DIR/depends/$HOST_PLATFORM"
     BDB_CONFIG=""
 
-    if [ -d "$BDB_PREFIX" ]; then
-        log_info "Using BerkeleyDB 4.8 from $BDB_PREFIX"
-        BDB_CONFIG="BDB_LIBS=-L${BDB_PREFIX}/lib -ldb_cxx-4.8 BDB_CFLAGS=-I${BDB_PREFIX}/include"
+    if [ -f "$BDB_PREFIX/lib/libdb_cxx-4.8.a" ]; then
+        log_info "Using BerkeleyDB 4.8 from depends/$HOST_PLATFORM"
+        BDB_CONFIG="BDB_LIBS=\"-L${BDB_PREFIX}/lib -ldb_cxx-4.8\" BDB_CFLAGS=\"-I${BDB_PREFIX}/include\""
     else
-        log_warn "BerkeleyDB 4.8 not found at $BDB_PREFIX"
+        log_warn "BerkeleyDB 4.8 not found in depends"
         log_warn "Will use system BerkeleyDB (may break wallet compatibility)"
         BDB_CONFIG="--with-incompatible-bdb"
     fi
