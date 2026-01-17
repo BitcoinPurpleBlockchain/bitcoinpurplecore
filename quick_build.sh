@@ -39,24 +39,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Detect host architecture for depends system
+# Query the depends system to get the correct HOST value
+# This ensures compatibility with how depends actually determines the platform
 ARCH=$(uname -m)
-case "$ARCH" in
-    x86_64)
-        HOST_PLATFORM="x86_64-pc-linux-gnu"
-        ;;
-    aarch64|arm64)
-        HOST_PLATFORM="aarch64-linux-gnu"
-        ;;
-    armv7*|armhf)
-        HOST_PLATFORM="arm-linux-gnueabihf"
-        ;;
-    *)
-        log_error "Unsupported architecture: $ARCH"
-        exit 1
-        ;;
-esac
+HOST_PLATFORM=$(cd "$SCRIPT_DIR/depends" && make print-HOST 2>/dev/null | grep -oP 'HOST=\K.*' || echo "")
 
-log_info "Detected architecture: $ARCH ($HOST_PLATFORM)"
+if [ -z "$HOST_PLATFORM" ]; then
+    log_error "Failed to detect HOST platform from depends system"
+    exit 1
+fi
+
+log_info "Detected architecture: $ARCH"
+log_info "Depends HOST platform: $HOST_PLATFORM"
 
 ###############################################################################
 # STEP 1: Install Dependencies
