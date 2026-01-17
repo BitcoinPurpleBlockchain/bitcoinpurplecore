@@ -176,14 +176,11 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data estimated for genesis + early blocks
-            // nTime: Genesis block timestamp (August 2023)
-            // nTxCount: Genesis coinbase transaction
-            // dTxRate: Conservative estimate ~0.01 tx/sec (0.6 tx/min, ~1 tx per block initially)
-            //          This will be updated as the chain grows
-            .nTime    = 1691126832,  // Genesis block time
-            .nTxCount = 1,           // Genesis coinbase transaction
-            .dTxRate  = 0.01,        // ~0.6 transactions per minute (conservative estimate)
+            // Data from RPC: getchaintxstats 4096 000000000000061d99da8846f32e810efdce554c0429e7e7cdde49863578e927
+            // Collected from fully synced mainnet node at block 917,081 (Jan 2026)
+            .nTime    = 1768648137,   // Block 917,081 timestamp
+            .nTxCount = 1039113,      // Total transactions at this block
+            .dTxRate  = 0.01935784,   // Actual tx rate from last 4096 blocks (~1.16 tx/min)
         };
     }
 };
@@ -375,7 +372,7 @@ public:
         uint256 hash = h.GetHash();
         memcpy(pchMessageStart, hash.begin(), 4);
 
-        nDefaultPort = 313496;
+        nDefaultPort = 33496;
         nPruneAfterHeight = 1000;
 
         genesis = CreateGenesisBlock(1691126842, 1829993, 0x1e0377ae, 1, 1 * COIN);
