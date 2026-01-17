@@ -176,10 +176,14 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data from RPC: getchaintxstats 4096 000003823fbf82ea4906cbe214617ce7a70a5da29c19ecb1d65618bcf04ec015
-            .nTime    = 1691126832,
-            .nTxCount = 0,
-            .dTxRate  = 0,
+            // Data estimated for genesis + early blocks
+            // nTime: Genesis block timestamp (August 2023)
+            // nTxCount: Genesis coinbase transaction
+            // dTxRate: Conservative estimate ~0.01 tx/sec (0.6 tx/min, ~1 tx per block initially)
+            //          This will be updated as the chain grows
+            .nTime    = 1691126832,  // Genesis block time
+            .nTxCount = 1,           // Genesis coinbase transaction
+            .dTxRate  = 0.01,        // ~0.6 transactions per minute (conservative estimate)
         };
     }
 };
@@ -285,10 +289,10 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data from RPC: getchaintxstats 4096 000002fdc3921c1ad368816fcc587f499698d42b42ab5a5d94ee67882ef9d998
-            .nTime    = 1691126837,
-            .nTxCount = 0,
-            .dTxRate  = 0,
+            // Data estimated for testnet genesis + early blocks
+            .nTime    = 1691126837,  // Testnet genesis block time
+            .nTxCount = 1,           // Genesis coinbase transaction
+            .dTxRate  = 0.005,       // Lower rate for testnet (half of mainnet)
         };
     }
 };
@@ -313,10 +317,10 @@ public:
             m_assumed_blockchain_size = 1;
             m_assumed_chain_state_size = 0;
             chainTxData = ChainTxData{
-                // Data from RPC: getchaintxstats 4096 00000131aa3124412b7ba8473f137922692c88da8fe26042e250c6cd76b7b403
-                .nTime    = 1691126842,
-                .nTxCount = 0,
-                .dTxRate  = 0,
+                // Data estimated for signet genesis + early blocks
+                .nTime    = 1691126842,  // Signet genesis block time
+                .nTxCount = 1,           // Genesis coinbase transaction
+                .dTxRate  = 0.003,       // Even lower rate for signet
             };
         } else {
             bin = *options.challenge;
@@ -537,9 +541,10 @@ public:
         m_assumeutxo_data = MapAssumeutxo{};
 
         chainTxData = ChainTxData{
-            0,
-            0,
-            0
+            // Regtest: instant blocks for testing, higher tx rate
+            .nTime    = 0,
+            .nTxCount = 0,
+            .dTxRate  = 0.1,  // Higher rate for regtest (instant blocks)
         };
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,56);
