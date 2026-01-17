@@ -41,6 +41,7 @@ START_TIME=$(date +%s)
 build_platform() {
     local platform=$1
     local platform_name=$2
+    shift 2  # Remove platform and platform_name from arguments
 
     log_step "Building $platform_name..."
 
